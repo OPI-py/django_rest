@@ -4,22 +4,12 @@ from django.contrib.auth.models import User
 
 
 class SnippetSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
         model = Snippet
-        owner = serializers.ReadOnlyField(source='owner.username')
-        fields = [
-            'id', 'title', 'code', 'linenos', 'language', 'style', 'owner'
-        ]
-
-# class SnippetSerializer(serializers.Serializer):
-#     id = serializers.IntegerField(read_only=True)
-#     title = serializers.CharField(required=False, allow_blank=True, 
-#         max_length=100)
-#     code = serializers.CharField(style={'base_template': 'textarea.html'})
-#     linenos = serializers.BooleanField(required=False)
-#     language = serializers.ChoiceField(choices=LANGUAGE_CHOICES, 
-#         default='English')
-#     style = serializers.ChoiceField(choices=STYLE_CHOICES, default='e')
+        fields = ['url', 'id', 'title', 'code',
+            'linenos', 'language', 'style', 'owner']
 
     def create(self, validated_data):
         return Snippet.objects.create(**validated_data)
@@ -35,10 +25,10 @@ class SnippetSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserSerializer(serializers.ModelSerializer):
-    snippets = serializers.PrimaryKeyRelatedField(many=True,
-        queryset=Snippet.objects.all())
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    snippets = serializers.HyperlinkedRelatedField(many=True,
+        view_name='snippet-detail', read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'snippets']
+        fields = ['url', 'id', 'username', 'snippets']
