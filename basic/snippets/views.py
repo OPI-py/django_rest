@@ -6,9 +6,12 @@ from snippets.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+# from rest_framework.renderers import TemplateHTMLRenderer
 
 
 class SnippetViewSet(viewsets.ModelViewSet):
+    # renderer_classes = [TemplateHTMLRenderer]
+    # template_name = 'snippets_template.html'
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
